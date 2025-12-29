@@ -27,21 +27,19 @@ export default function Header() {
             />
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-8">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-sm font-medium text-charcoal/80 hover:text-coral transition-colors"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-
-          {/* Desktop CTA */}
-          <div className="hidden md:block">
+          {/* Desktop Navigation & CTA */}
+          <div className="hidden md:flex items-center gap-8">
+            <nav className="flex items-center gap-8">
+              {NAV_LINKS.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="text-sm font-medium text-charcoal/80 hover:text-coral transition-colors"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
             <Button asChild>
               <Link href="#contact">Get in Touch</Link>
             </Button>

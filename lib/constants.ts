@@ -8,10 +8,10 @@ import {
 } from "lucide-react";
 
 export const NAV_LINKS = [
+  { href: "#about", label: "About" },
   { href: "#services", label: "Services" },
   { href: "#packages", label: "Packages" },
   { href: "#work", label: "Work" },
-  { href: "#contact", label: "Contact" },
 ] as const;
 
 export const SERVICES = [
