@@ -156,7 +156,7 @@ export const CASE_STUDIES = [
     name: "MEP",
     subtitle: "National Education Platform",
     description:
-      "Large-scale educational infrastructure serving thousands of students across the country.",
+      "Large-scale educational infrastructure serving hundreds of thousands of students across the country.",
     tags: ["Education", "Infrastructure", "Scale"],
   },
   {
