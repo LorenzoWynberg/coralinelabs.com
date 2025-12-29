@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,6 +13,14 @@ export default function ContactSection() {
     ContactFormState,
     FormData
   >(submitContactForm, null);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // Only reset form on successful submission
+  useEffect(() => {
+    if (state?.success) {
+      formRef.current?.reset();
+    }
+  }, [state?.success]);
 
   return (
     <section id="contact" className="py-20 md:py-28 bg-coral">
@@ -40,7 +48,7 @@ export default function ContactSection() {
                 <p className="text-driftwood">{state.message}</p>
               </div>
             ) : (
-              <form action={formAction} className="space-y-6">
+              <form ref={formRef} action={formAction} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Name */}
                   <div className="space-y-2">
