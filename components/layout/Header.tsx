@@ -56,27 +56,20 @@ export default function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] bg-bone">
-              <div className="flex flex-col gap-6 mt-8">
-                <Image
-                  src="/imgs/logos/01_primary_horizontal.png"
-                  alt="Coraline Labs"
-                  width={140}
-                  height={31}
-                  className="h-7 w-auto"
-                />
+              <div className="flex flex-col gap-6 mt-8 px-2">
                 <nav className="flex flex-col gap-4">
                   {NAV_LINKS.map((link) => (
                     <Link
                       key={link.href}
                       href={link.href}
                       onClick={() => setIsOpen(false)}
-                      className="text-lg font-medium text-charcoal hover:text-coral transition-colors"
+                      className="text-lg font-medium text-charcoal hover:text-coral transition-colors pl-2"
                     >
                       {link.label}
                     </Link>
                   ))}
                 </nav>
-                <Button asChild className="mt-4">
+                <Button asChild className="mt-4 mx-2">
                   <Link href="#contact" onClick={() => setIsOpen(false)}>
                     Get in Touch
                   </Link>
