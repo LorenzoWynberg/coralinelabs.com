@@ -9,10 +9,10 @@ import { submitContactForm, ContactFormState } from "@/app/actions/contact";
 import { Send, CheckCircle, AlertCircle } from "lucide-react";
 
 export default function ContactSection() {
-  const [state, formAction, isPending] = useActionState<ContactFormState, FormData>(
-    submitContactForm,
-    null
-  );
+  const [state, formAction, isPending] = useActionState<
+    ContactFormState,
+    FormData
+  >(submitContactForm, null);
 
   return (
     <section id="contact" className="py-20 md:py-28 bg-coral">
@@ -55,6 +55,11 @@ export default function ContactSection() {
                       placeholder="Your name"
                       className="bg-bone/50 border-sand focus:border-coral"
                     />
+                    {state?.errors?.name && (
+                      <p className="text-sm text-coral">
+                        {state.errors.name[0]}
+                      </p>
+                    )}
                   </div>
 
                   {/* Email */}
@@ -70,6 +75,11 @@ export default function ContactSection() {
                       placeholder="your@email.com"
                       className="bg-bone/50 border-sand focus:border-coral"
                     />
+                    {state?.errors?.email && (
+                      <p className="text-sm text-coral">
+                        {state.errors.email[0]}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -85,6 +95,11 @@ export default function ContactSection() {
                     placeholder="Your company name"
                     className="bg-bone/50 border-sand focus:border-coral"
                   />
+                  {state?.errors?.company && (
+                    <p className="text-sm text-coral">
+                      {state.errors.company[0]}
+                    </p>
+                  )}
                 </div>
 
                 {/* Message */}
@@ -100,11 +115,16 @@ export default function ContactSection() {
                     placeholder="Tell us about your project..."
                     className="bg-bone/50 border-sand focus:border-coral resize-none"
                   />
+                  {state?.errors?.message && (
+                    <p className="text-sm text-coral">
+                      {state.errors.message[0]}
+                    </p>
+                  )}
                 </div>
 
                 {/* Error Message */}
                 {state && !state.success && (
-                  <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-lg">
+                  <div className="flex items-center gap-2 text-coral bg-coral/10 p-3 rounded-lg">
                     <AlertCircle className="w-5 h-5 flex-shrink-0" />
                     <p className="text-sm">{state.message}</p>
                   </div>

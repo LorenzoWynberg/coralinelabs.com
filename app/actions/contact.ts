@@ -1,39 +1,55 @@
 "use server";
 
 import { Resend } from "resend";
+import { z } from "zod";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+
+const contactFormSchema = z.object({
+  name: z.string().min(1, "Name is required").max(100, "Name is too long"),
+  email: z.string().email("Please enter a valid email address"),
+  company: z.string().max(100, "Company name is too long").optional(),
+  message: z
+    .string()
+    .min(10, "Message must be at least 10 characters")
+    .max(1000, "Message is too long"),
+});
 
 export type ContactFormState = {
   success: boolean;
   message: string;
+  errors?: {
+    name?: string[];
+    email?: string[];
+    company?: string[];
+    message?: string[];
+  };
 } | null;
 
 export async function submitContactForm(
   _prevState: ContactFormState,
-  formData: FormData
+  formData: FormData,
 ): Promise<ContactFormState> {
-  const name = formData.get("name") as string;
-  const email = formData.get("email") as string;
-  const company = formData.get("company") as string;
-  const message = formData.get("message") as string;
+  const rawData = {
+    name: formData.get("name"),
+    email: formData.get("email"),
+    company: formData.get("company") || undefined,
+    message: formData.get("message"),
+  };
 
-  // Validate required fields
-  if (!name || !email || !message) {
+  // Validate with Zod
+  const validationResult = contactFormSchema.safeParse(rawData);
+
+  if (!validationResult.success) {
+    const errors = validationResult.error.flatten().fieldErrors;
     return {
       success: false,
-      message: "Please fill in all required fields.",
+      message: "Please fix the errors in the form.",
+      errors,
     };
   }
 
-  // Basic email validation
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    return {
-      success: false,
-      message: "Please enter a valid email address.",
-    };
-  }
+  const { name, email, company, message } = validationResult.data;
 
   try {
     await resend.emails.send({
