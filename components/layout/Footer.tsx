@@ -16,7 +16,7 @@ export default function Footer() {
               alt="Coraline Labs"
               width={120}
               height={94}
-              className="h-20 w-auto"
+              className="w-auto"
             />
             <p className="text-sm text-bone/60 max-w-xs">
               Built with care. Engineered to last.
