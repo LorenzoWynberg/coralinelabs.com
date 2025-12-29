@@ -8,12 +8,9 @@ import {
 } from "lucide-react";
 
 export const NAV_LINKS = [
-  { href: "#about", label: "About" },
   { href: "#services", label: "Services" },
-  { href: "#approach", label: "Approach" },
   { href: "#packages", label: "Packages" },
   { href: "#work", label: "Work" },
-  { href: "#team", label: "Team" },
   { href: "#contact", label: "Contact" },
 ] as const;
 
@@ -78,8 +75,7 @@ export const APPROACH_STEPS = [
   {
     step: 4,
     title: "Support",
-    description:
-      "We support and evolve your systems as your business grows.",
+    description: "We support and evolve your systems as your business grows.",
   },
 ] as const;
 
@@ -87,7 +83,8 @@ export const PACKAGES = [
   {
     name: "Digital Presence",
     price: "$1,500 - $3,000",
-    description: "Perfect for businesses needing a professional online presence.",
+    description:
+      "Perfect for businesses needing a professional online presence.",
     features: [
       "1-5 page website or landing page",
       "UX & conversion-focused copy",
@@ -100,7 +97,8 @@ export const PACKAGES = [
   {
     name: "Brand & Visual Identity",
     price: "$1,500 - $4,000",
-    description: "Establish a cohesive brand that resonates with your audience.",
+    description:
+      "Establish a cohesive brand that resonates with your audience.",
     features: [
       "Logo creation or refinement",
       "Color palette & typography",
