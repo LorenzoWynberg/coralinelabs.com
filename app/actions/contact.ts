@@ -2,8 +2,64 @@
 
 import { Resend } from "resend";
 import { z } from "zod";
+import { headers } from "next/headers";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+
+// Rate limiting configuration
+const RATE_LIMIT_WINDOW = 15 * 60 * 1000; // 15 minutes in milliseconds
+const MAX_SUBMISSIONS = 3; // Maximum submissions per window
+
+// In-memory store for rate limiting
+const rateLimitStore = new Map<
+  string,
+  { count: number; resetTime: number }
+>();
+
+// Clean up old entries periodically
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, data] of rateLimitStore.entries()) {
+    if (now > data.resetTime) {
+      rateLimitStore.delete(ip);
+    }
+  }
+}, 60 * 1000); // Clean up every minute
+
+function getClientIP(): string {
+  const headersList = headers();
+  // Try to get IP from various headers (in order of priority)
+  return (
+    headersList.get("x-forwarded-for")?.split(",")[0].trim() ||
+    headersList.get("x-real-ip") ||
+    headersList.get("cf-connecting-ip") || // Cloudflare
+    "unknown"
+  );
+}
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const record = rateLimitStore.get(ip);
+
+  if (!record || now > record.resetTime) {
+    // No record or expired - create new entry
+    rateLimitStore.set(ip, {
+      count: 1,
+      resetTime: now + RATE_LIMIT_WINDOW,
+    });
+    return false;
+  }
+
+  if (record.count >= MAX_SUBMISSIONS) {
+    // Rate limit exceeded
+    return true;
+  }
+
+  // Increment count
+  record.count++;
+  rateLimitStore.set(ip, record);
+  return false;
+}
 
 const contactFormSchema = z.object({
   name: z.string().min(1, "Name is required").max(100, "Name is too long"),
@@ -37,6 +93,16 @@ export async function submitContactForm(
     return {
       success: false,
       message: "Something went wrong. Please try again.",
+    };
+  }
+
+  // Check rate limiting
+  const clientIP = getClientIP();
+  if (isRateLimited(clientIP)) {
+    return {
+      success: false,
+      message:
+        "Too many submission attempts. Please try again in a few minutes.",
     };
   }
 

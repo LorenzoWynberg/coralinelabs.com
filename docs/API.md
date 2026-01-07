@@ -32,12 +32,13 @@ export async function submitContactForm(
 
 #### Form Fields
 
-| Field     | Type   | Required | Validation         |
-| --------- | ------ | -------- | ------------------ |
-| `name`    | string | Yes      | 1-100 characters   |
-| `email`   | string | Yes      | Valid email format |
-| `company` | string | No       | 0-100 characters   |
-| `message` | string | Yes      | 10-1000 characters |
+| Field     | Type   | Required | Validation         | Notes                       |
+| --------- | ------ | -------- | ------------------ | --------------------------- |
+| `name`    | string | Yes      | 1-100 characters   |                             |
+| `email`   | string | Yes      | Valid email format |                             |
+| `company` | string | No       | 0-100 characters   |                             |
+| `message` | string | Yes      | 10-1000 characters |                             |
+| `website` | string | No       | N/A                | Honeypot field (must be empty) |
 
 #### Return Type
 
@@ -84,6 +85,24 @@ type ContactFormState = {
 {
   "success": false,
   "message": "Something went wrong. Please try again later."
+}
+```
+
+**Rate Limit Exceeded:**
+
+```json
+{
+  "success": false,
+  "message": "Too many submission attempts. Please try again in a few minutes."
+}
+```
+
+**Bot Detection (Honeypot):**
+
+```json
+{
+  "success": false,
+  "message": "Something went wrong. Please try again."
 }
 ```
 
@@ -166,15 +185,60 @@ export function ContactForm() {
 
    - Validation errors: Returns field-specific errors
    - API errors: Returns generic error message
-   - Rate limiting: Handled by Resend
+   - Rate limiting: IP-based rate limiting (3 submissions per 15 minutes)
+   - Bot detection: Honeypot field validation
 
 4. **Security:**
    - Server-side validation
    - No client-side API key exposure
    - Input sanitization via Zod
    - CSRF protection via Next.js
+   - Honeypot field for bot detection
+   - Rate limiting per IP address
+
+#### Spam Protection
+
+The contact form implements multiple layers of spam protection:
+
+1. **Honeypot Field:**
+   - Hidden `website` field that bots typically auto-fill
+   - Position: absolute with off-screen coordinates
+   - tabIndex: -1 (excluded from keyboard navigation)
+   - autoComplete: off (prevents browser auto-fill)
+   - If filled, submission is silently rejected
+
+2. **Rate Limiting:**
+   - IP-based rate limiting: 3 submissions per 15 minutes
+   - In-memory cache with automatic cleanup
+   - Prevents automated spam attacks
+   - Returns generic error to avoid revealing limits
+
+3. **Server-Side Validation:**
+   - All validation occurs server-side
+   - Zod schema validation
+   - Field length limits
+   - Email format validation
+
+**Implementation Details:**
+
+The rate limiter uses an in-memory Map to track submissions:
+- Key: Client IP address (from `x-forwarded-for`, `x-real-ip`, or `cf-connecting-ip` headers)
+- Value: Submission count and reset timestamp
+- Cleanup: Automatic cleanup runs every minute to remove expired entries
+- Storage: In-memory (resets on server restart)
+
+IP address detection priority:
+1. `x-forwarded-for` header (first IP in comma-separated list)
+2. `x-real-ip` header
+3. `cf-connecting-ip` header (Cloudflare)
+4. Fallback: "unknown"
+
+**Note:** In-memory rate limiting works well for single-instance deployments. For production multi-instance deployments, consider using Redis or similar for distributed rate limiting.
 
 #### Rate Limits
+
+Application rate limits:
+- 3 submissions per IP address per 15 minutes
 
 Resend API limits (Free tier):
 
