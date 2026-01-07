@@ -16,6 +16,7 @@ export default function ContactSection() {
     FormData
   >(submitContactForm, null);
   const formRef = useRef<HTMLFormElement>(null);
+  const phoneContainerRef = useRef<HTMLDivElement>(null);
   const [phoneValue, setPhoneValue] = useState<string>("");
 
   // Only reset form on successful submission
@@ -25,6 +26,43 @@ export default function ContactSection() {
       setPhoneValue("");
     }
   }, [state?.success]);
+
+  // Handle autofill on the phone input's internal input element
+  useEffect(() => {
+    if (!phoneContainerRef.current) return;
+
+    // Find the actual input element inside the PhoneInput component
+    const phoneInput = phoneContainerRef.current.querySelector(
+      'input[type="tel"]'
+    ) as HTMLInputElement;
+
+    if (!phoneInput) return;
+
+    const handleAutofill = () => {
+      // Use requestAnimationFrame to ensure autofill has completed
+      requestAnimationFrame(() => {
+        const autofilledValue = phoneInput.value;
+        if (autofilledValue && autofilledValue !== phoneValue) {
+          // Clean and format the autofilled value
+          // Remove any non-digit characters except the leading +
+          const cleaned = autofilledValue.replace(/[^\d+]/g, "");
+          setPhoneValue(cleaned);
+        }
+      });
+    };
+
+    // Listen for autofill events
+    phoneInput.addEventListener("change", handleAutofill);
+    phoneInput.addEventListener("input", handleAutofill);
+    // Also listen for animationstart which can detect autofill
+    phoneInput.addEventListener("animationstart", handleAutofill);
+
+    return () => {
+      phoneInput.removeEventListener("change", handleAutofill);
+      phoneInput.removeEventListener("input", handleAutofill);
+      phoneInput.removeEventListener("animationstart", handleAutofill);
+    };
+  }, [phoneValue]);
 
   return (
     <section id="contact" className="py-20 md:py-28 bg-coral">
@@ -100,18 +138,20 @@ export default function ContactSection() {
                   <Label htmlFor="phone" className="text-charcoal">
                     Phone <span className="text-driftwood">(optional)</span>
                   </Label>
-                  <PhoneInput
-                    id="phone"
-                    international
-                    defaultCountry="US"
-                    value={phoneValue}
-                    onChange={(value) => setPhoneValue(value || "")}
-                    className="phone-input bg-bone/50 border border-sand rounded-md focus-within:border-coral transition-colors"
-                    placeholder="Enter phone number"
-                    numberInputProps={{
-                      autoComplete: "tel",
-                    }}
-                  />
+                  <div ref={phoneContainerRef}>
+                    <PhoneInput
+                      id="phone"
+                      international
+                      defaultCountry="US"
+                      value={phoneValue}
+                      onChange={(value) => setPhoneValue(value || "")}
+                      className="phone-input bg-bone/50 border border-sand rounded-md focus-within:border-coral transition-colors"
+                      placeholder="Enter phone number"
+                      numberInputProps={{
+                        autoComplete: "tel",
+                      }}
+                    />
+                  </div>
                   {/* Hidden input to ensure form submission uses React state value */}
                   <input type="hidden" name="phone" value={phoneValue} />
                   {state?.errors?.phone && (
