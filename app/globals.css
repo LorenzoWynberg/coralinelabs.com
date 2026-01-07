@@ -86,3 +86,51 @@ html {
         font-family: var(--font-playfair);
     }
 }
+
+@layer components {
+    /* Phone Input Styling */
+    .phone-input {
+        padding: 0.5rem 0.75rem;
+    }
+
+    .phone-input .PhoneInputInput {
+        background: transparent;
+        border: none;
+        outline: none;
+        color: #2e2e2c;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+    }
+
+    .phone-input .PhoneInputInput::placeholder {
+        color: #8a8f8c;
+    }
+
+    .phone-input .PhoneInputCountry {
+        margin-right: 0.5rem;
+    }
+
+    .phone-input .PhoneInputCountryIcon {
+        width: 1.25rem;
+        height: 1.25rem;
+        border-radius: 0.125rem;
+    }
+
+    .phone-input .PhoneInputCountrySelect {
+        background: transparent;
+        border: none;
+        outline: none;
+        color: #2e2e2c;
+    }
+
+    .phone-input .PhoneInputCountrySelect:focus {
+        outline: none;
+    }
+
+    .phone-input .PhoneInputCountrySelectArrow {
+        width: 0.375rem;
+        height: 0.375rem;
+        border-color: #8a8f8c;
+        opacity: 0.7;
+    }
+}

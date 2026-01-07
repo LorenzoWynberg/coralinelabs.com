@@ -3,6 +3,7 @@
 import { Resend } from "resend";
 import { z } from "zod";
 import { headers } from "next/headers";
+import { isValidPhoneNumber } from "react-phone-number-input";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -64,6 +65,13 @@ function isRateLimited(ip: string): boolean {
 const contactFormSchema = z.object({
   name: z.string().min(1, "Name is required").max(100, "Name is too long"),
   email: z.string().email("Please enter a valid email address"),
+  phone: z
+    .string()
+    .optional()
+    .refine(
+      (val) => !val || isValidPhoneNumber(val),
+      "Please enter a valid phone number with country code",
+    ),
   company: z.string().max(100, "Company name is too long").optional(),
   message: z
     .string()
@@ -77,6 +85,7 @@ export type ContactFormState = {
   errors?: {
     name?: string[];
     email?: string[];
+    phone?: string[];
     company?: string[];
     message?: string[];
   };
@@ -109,6 +118,7 @@ export async function submitContactForm(
   const rawData = {
     name: formData.get("name"),
     email: formData.get("email"),
+    phone: formData.get("phone") || undefined,
     company: formData.get("company") || undefined,
     message: formData.get("message"),
   };
@@ -125,7 +135,7 @@ export async function submitContactForm(
     };
   }
 
-  const { name, email, company, message } = validationResult.data;
+  const { name, email, phone, company, message } = validationResult.data;
 
   try {
     await resend.emails.send({
@@ -137,6 +147,7 @@ export async function submitContactForm(
         <h2>New Contact Form Submission</h2>
         <p><strong>Name:</strong> ${name}</p>
         <p><strong>Email:</strong> ${email}</p>
+        ${phone ? `<p><strong>Phone:</strong> ${phone}</p>` : ""}
         ${company ? `<p><strong>Company:</strong> ${company}</p>` : ""}
         <p><strong>Message:</strong></p>
         <p>${message.replace(/\n/g, "<br>")}</p>
@@ -146,6 +157,7 @@ New Contact Form Submission
 
 Name: ${name}
 Email: ${email}
+${phone ? `Phone: ${phone}\n` : ""}
 ${company ? `Company: ${company}\n` : ""}
 Message:
 ${message}

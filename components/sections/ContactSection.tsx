@@ -1,12 +1,14 @@
 "use client";
 
-import { useActionState, useRef, useEffect } from "react";
+import { useActionState, useRef, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { submitContactForm, ContactFormState } from "@/app/actions/contact";
 import { Send, CheckCircle, AlertCircle } from "lucide-react";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 
 export default function ContactSection() {
   const [state, formAction, isPending] = useActionState<
@@ -14,11 +16,13 @@ export default function ContactSection() {
     FormData
   >(submitContactForm, null);
   const formRef = useRef<HTMLFormElement>(null);
+  const [phoneValue, setPhoneValue] = useState<string>("");
 
   // Only reset form on successful submission
   useEffect(() => {
     if (state?.success) {
       formRef.current?.reset();
+      setPhoneValue("");
     }
   }, [state?.success]);
 
@@ -89,6 +93,28 @@ export default function ContactSection() {
                       </p>
                     )}
                   </div>
+                </div>
+
+                {/* Phone */}
+                <div className="space-y-2">
+                  <Label htmlFor="phone" className="text-charcoal">
+                    Phone <span className="text-driftwood">(optional)</span>
+                  </Label>
+                  <PhoneInput
+                    id="phone"
+                    international
+                    defaultCountry="US"
+                    value={phoneValue}
+                    onChange={(value) => setPhoneValue(value || "")}
+                    className="phone-input bg-bone/50 border border-sand rounded-md focus-within:border-coral transition-colors"
+                    placeholder="Enter phone number"
+                  />
+                  <input type="hidden" name="phone" value={phoneValue} />
+                  {state?.errors?.phone && (
+                    <p className="text-sm text-coral">
+                      {state.errors.phone[0]}
+                    </p>
+                  )}
                 </div>
 
                 {/* Company */}

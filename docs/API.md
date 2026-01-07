@@ -32,13 +32,14 @@ export async function submitContactForm(
 
 #### Form Fields
 
-| Field     | Type   | Required | Validation         | Notes                       |
-| --------- | ------ | -------- | ------------------ | --------------------------- |
-| `name`    | string | Yes      | 1-100 characters   |                             |
-| `email`   | string | Yes      | Valid email format |                             |
-| `company` | string | No       | 0-100 characters   |                             |
-| `message` | string | Yes      | 10-1000 characters |                             |
-| `website` | string | No       | N/A                | Honeypot field (must be empty) |
+| Field     | Type   | Required | Validation                          | Notes                          |
+| --------- | ------ | -------- | ----------------------------------- | ------------------------------ |
+| `name`    | string | Yes      | 1-100 characters                    |                                |
+| `email`   | string | Yes      | Valid email format                  |                                |
+| `phone`   | string | No       | Valid international phone number    | E.164 format with country code |
+| `company` | string | No       | 0-100 characters                    |                                |
+| `message` | string | Yes      | 10-1000 characters                  |                                |
+| `website` | string | No       | N/A                                 | Honeypot field (must be empty) |
 
 #### Return Type
 
@@ -49,6 +50,7 @@ type ContactFormState = {
   errors?: {
     name?: string[];
     email?: string[];
+    phone?: string[];
     company?: string[];
     message?: string[];
   };
@@ -110,15 +112,18 @@ type ContactFormState = {
 
 ```tsx
 "use client";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { submitContactForm } from "@/app/actions/contact";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 
 export function ContactForm() {
   const [state, formAction] = useActionState(submitContactForm, null);
+  const [phoneValue, setPhoneValue] = useState<string>("");
 
   return (
     <form action={formAction} className="space-y-4">
@@ -135,6 +140,22 @@ export function ContactForm() {
         <Input id="email" name="email" type="email" required />
         {state?.errors?.email && (
           <p className="text-red-500 text-sm mt-1">{state.errors.email[0]}</p>
+        )}
+      </div>
+
+      <div>
+        <Label htmlFor="phone">Phone</Label>
+        <PhoneInput
+          id="phone"
+          international
+          defaultCountry="US"
+          value={phoneValue}
+          onChange={(value) => setPhoneValue(value || "")}
+          placeholder="Enter phone number"
+        />
+        <input type="hidden" name="phone" value={phoneValue} />
+        {state?.errors?.phone && (
+          <p className="text-red-500 text-sm mt-1">{state.errors.phone[0]}</p>
         )}
       </div>
 
@@ -174,27 +195,38 @@ export function ContactForm() {
    - Returns field-specific error messages
    - Validates on server-side for security
 
-2. **Email Delivery:**
+2. **Phone Number Handling:**
+
+   - Uses `react-phone-number-input` library for formatting and validation
+   - Supports international phone numbers with country codes
+   - Automatic formatting as user types
+   - E.164 format validation (e.g., +14155552671)
+   - Country selector with flags
+   - Optional field - validated only if provided
+   - Default country: United States
+
+3. **Email Delivery:**
 
    - Uses Resend API for email sending
    - Sends to: contact@coralinelabs.com
    - Reply-to: user's email address
-   - Includes all form data in email body
+   - Includes all form data in email body (name, email, phone, company, message)
 
-3. **Error Handling:**
+4. **Error Handling:**
 
    - Validation errors: Returns field-specific errors
    - API errors: Returns generic error message
    - Rate limiting: IP-based rate limiting (3 submissions per 15 minutes)
    - Bot detection: Honeypot field validation
 
-4. **Security:**
+5. **Security:**
    - Server-side validation
    - No client-side API key exposure
    - Input sanitization via Zod
    - CSRF protection via Next.js
    - Honeypot field for bot detection
    - Rate limiting per IP address
+   - Phone number validation with libphonenumber-js
 
 #### Spam Protection
 
