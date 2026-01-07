@@ -27,8 +27,8 @@ setInterval(() => {
   }
 }, 60 * 1000); // Clean up every minute
 
-function getClientIP(): string {
-  const headersList = headers();
+async function getClientIP(): Promise<string> {
+  const headersList = await headers();
   // Try to get IP from various headers (in order of priority)
   return (
     headersList.get("x-forwarded-for")?.split(",")[0].trim() ||
@@ -106,7 +106,7 @@ export async function submitContactForm(
   }
 
   // Check rate limiting
-  const clientIP = getClientIP();
+  const clientIP = await getClientIP();
   if (isRateLimited(clientIP)) {
     return {
       success: false,
