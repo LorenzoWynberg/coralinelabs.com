@@ -30,6 +30,16 @@ export async function submitContactForm(
   _prevState: ContactFormState,
   formData: FormData,
 ): Promise<ContactFormState> {
+  // Check honeypot field - if filled, it's likely a bot
+  const honeypot = formData.get("website");
+  if (honeypot) {
+    // Silently reject spam without giving feedback to the bot
+    return {
+      success: false,
+      message: "Something went wrong. Please try again.",
+    };
+  }
+
   const rawData = {
     name: formData.get("name"),
     email: formData.get("email"),

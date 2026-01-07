@@ -130,6 +130,21 @@ export default function ContactSection() {
                   )}
                 </div>
 
+                {/* Honeypot field - hidden from real users */}
+                <input
+                  type="text"
+                  name="website"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  style={{
+                    position: "absolute",
+                    left: "-9999px",
+                    width: "1px",
+                    height: "1px",
+                  }}
+                  aria-hidden="true"
+                />
+
                 {/* Error Message */}
                 {state && !state.success && (
                   <div className="flex items-center gap-2 text-coral bg-coral/10 p-3 rounded-lg">
