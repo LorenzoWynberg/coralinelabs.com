@@ -160,9 +160,31 @@ Topics covered:
 - Adding new server actions
 - Best practices
 - Security
-- Testing
+- Spam protection (honeypot & rate limiting)
+- Phone number validation
 
 **Best for:** API integration, form handling, server action development
+
+---
+
+### 🧪 [TESTING.md](TESTING.md)
+
+**Testing documentation**
+
+Topics covered:
+
+- Test setup and configuration
+- Running tests
+- Writing component tests
+- Writing server action tests
+- Test coverage
+- Mocking strategies
+- Debugging tests
+- Best practices
+- CI/CD integration
+- Known issues
+
+**Best for:** Test development, quality assurance, test debugging
 
 ---
 
@@ -191,7 +213,8 @@ Topics covered:
 2. Review [DEVELOPMENT.md](DEVELOPMENT.md) for coding standards
 3. Reference [COMPONENTS.md](COMPONENTS.md) when building features
 4. Check [API.md](API.md) for server action development
-5. Use [DEPLOYMENT.md](DEPLOYMENT.md) for deployment
+5. See [TESTING.md](TESTING.md) for writing and running tests
+6. Use [DEPLOYMENT.md](DEPLOYMENT.md) for deployment
 
 ### For Content Editors
 
@@ -252,6 +275,10 @@ Topics covered:
 ### Component Usage Examples
 
 → [COMPONENTS.md § UI Components](COMPONENTS.md#ui-components-shadcnui)
+
+### Run Tests
+
+→ [TESTING.md § Running Tests](TESTING.md#running-tests)
 
 ---
 
