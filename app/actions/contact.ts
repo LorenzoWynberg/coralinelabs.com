@@ -3,7 +3,17 @@
 import { Resend } from "resend";
 import { z } from "zod";
 import { headers } from "next/headers";
-import { isValidPhoneNumber } from "react-phone-number-input";
+import { PhoneNumberUtil } from "google-libphonenumber";
+
+const phoneUtil = PhoneNumberUtil.getInstance();
+
+function isValidPhoneNumber(phone: string): boolean {
+  try {
+    return phoneUtil.isValidNumber(phoneUtil.parseAndKeepRawInput(phone));
+  } catch (error) {
+    return false;
+  }
+}
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
