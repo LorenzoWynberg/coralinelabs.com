@@ -108,8 +108,11 @@ export default function ContactSection() {
                     onChange={(value) => setPhoneValue(value || "")}
                     className="phone-input bg-bone/50 border border-sand rounded-md focus-within:border-coral transition-colors"
                     placeholder="Enter phone number"
+                    numberInputProps={{
+                      name: "phone",
+                      autoComplete: "tel",
+                    }}
                   />
-                  <input type="hidden" name="phone" value={phoneValue} />
                   {state?.errors?.phone && (
                     <p className="text-sm text-coral">
                       {state.errors.phone[0]}
