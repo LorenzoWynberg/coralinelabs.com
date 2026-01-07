@@ -1,14 +1,12 @@
 'use client';
 
-import { useActionState, useRef, useEffect, useState } from 'react';
+import { useActionState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { submitContactForm, ContactFormState } from '@/app/actions/contact';
 import { Send, CheckCircle, AlertCircle } from 'lucide-react';
-import { PhoneInput } from 'react-international-phone';
-import 'react-international-phone/style.css';
 
 export default function ContactSection() {
   const [state, formAction, isPending] = useActionState<
@@ -16,73 +14,13 @@ export default function ContactSection() {
     FormData
   >(submitContactForm, null);
   const formRef = useRef<HTMLFormElement>(null);
-  const phoneContainerRef = useRef<HTMLDivElement>(null);
-  const [phoneValue, setPhoneValue] = useState<string>('');
 
   // Only reset form on successful submission
   useEffect(() => {
     if (state?.success) {
       formRef.current?.reset();
-      setPhoneValue('');
     }
   }, [state?.success]);
-
-  // Handle autofill detection for phone input
-  useEffect(() => {
-    if (!phoneContainerRef.current) return;
-
-    // Find the actual input element inside react-international-phone
-    const phoneInput = phoneContainerRef.current.querySelector(
-      'input[type="tel"]'
-    ) as HTMLInputElement;
-
-    if (!phoneInput) return;
-
-    let autofillTimer: NodeJS.Timeout;
-
-    const handleAutofill = () => {
-      // Clear any existing timer
-      if (autofillTimer) clearTimeout(autofillTimer);
-
-      // Debounce to let autofill complete
-      autofillTimer = setTimeout(() => {
-        const value = phoneInput.value;
-        if (value && value !== phoneValue) {
-          console.log('Autofill detected, value:', value);
-          setPhoneValue(value);
-        }
-      }, 100);
-    };
-
-    // Multiple events that can indicate autofill
-    const events = ['change', 'input', 'animationstart', 'blur'];
-    events.forEach((event) => {
-      phoneInput.addEventListener(event, handleAutofill);
-    });
-
-    // Also check periodically for the first few seconds (for delayed autofill)
-    const checkInterval = setInterval(() => {
-      const value = phoneInput.value;
-      if (value && value !== phoneValue) {
-        console.log('Polling detected value:', value);
-        setPhoneValue(value);
-      }
-    }, 500);
-
-    // Stop polling after 5 seconds
-    const stopPolling = setTimeout(() => {
-      clearInterval(checkInterval);
-    }, 5000);
-
-    return () => {
-      events.forEach((event) => {
-        phoneInput.removeEventListener(event, handleAutofill);
-      });
-      clearInterval(checkInterval);
-      clearTimeout(stopPolling);
-      if (autofillTimer) clearTimeout(autofillTimer);
-    };
-  }, [phoneValue]);
 
   return (
     <section id="contact" className="py-20 md:py-28 bg-coral">
@@ -158,22 +96,14 @@ export default function ContactSection() {
                   <Label htmlFor="phone" className="text-charcoal">
                     Phone <span className="text-driftwood">(optional)</span>
                   </Label>
-                  <div ref={phoneContainerRef}>
-                    <PhoneInput
-                      defaultCountry="us"
-                      value={phoneValue}
-                      onChange={(phone) => setPhoneValue(phone)}
-                      placeholder="Enter phone number"
-                      inputProps={{
-                        autoComplete: 'tel',
-                        id: 'phone',
-                      }}
-                      className="phone-input-container"
-                      inputClassName="bg-bone/50 border-sand focus:border-coral"
-                    />
-                  </div>
-                  {/* Hidden input to ensure form submission uses React state value */}
-                  <input type="hidden" name="phone" value={phoneValue} />
+                  <Input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    autoComplete="tel"
+                    placeholder="Enter phone number"
+                    className="bg-bone/50 border-sand focus:border-coral"
+                  />
                   {state?.errors?.phone && (
                     <p className="text-sm text-coral">
                       {state.errors.phone[0]}

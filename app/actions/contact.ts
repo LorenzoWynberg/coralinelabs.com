@@ -3,17 +3,6 @@
 import { Resend } from "resend";
 import { z } from "zod";
 import { headers } from "next/headers";
-import { PhoneNumberUtil } from "google-libphonenumber";
-
-const phoneUtil = PhoneNumberUtil.getInstance();
-
-function isValidPhoneNumber(phone: string): boolean {
-  try {
-    return phoneUtil.isValidNumber(phoneUtil.parseAndKeepRawInput(phone));
-  } catch (error) {
-    return false;
-  }
-}
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -75,13 +64,7 @@ function isRateLimited(ip: string): boolean {
 const contactFormSchema = z.object({
   name: z.string().min(1, "Name is required").max(100, "Name is too long"),
   email: z.string().email("Please enter a valid email address"),
-  phone: z
-    .string()
-    .optional()
-    .refine(
-      (val) => !val || isValidPhoneNumber(val),
-      "Please enter a valid phone number with country code",
-    ),
+  phone: z.string().optional(),
   company: z.string().max(100, "Company name is too long").optional(),
   message: z
     .string()
