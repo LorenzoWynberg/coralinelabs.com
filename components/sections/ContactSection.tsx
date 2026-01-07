@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useActionState, useRef, useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { submitContactForm, ContactFormState } from "@/app/actions/contact";
-import { Send, CheckCircle, AlertCircle } from "lucide-react";
-import PhoneInput from "react-phone-number-input";
-import "react-phone-number-input/style.css";
+import { useActionState, useRef, useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { submitContactForm, ContactFormState } from '@/app/actions/contact';
+import { Send, CheckCircle, AlertCircle } from 'lucide-react';
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
 
 export default function ContactSection() {
   const [state, formAction, isPending] = useActionState<
@@ -17,13 +17,13 @@ export default function ContactSection() {
   >(submitContactForm, null);
   const formRef = useRef<HTMLFormElement>(null);
   const phoneContainerRef = useRef<HTMLDivElement>(null);
-  const [phoneValue, setPhoneValue] = useState<string>("");
+  const [phoneValue, setPhoneValue] = useState<string>('');
 
   // Only reset form on successful submission
   useEffect(() => {
     if (state?.success) {
       formRef.current?.reset();
-      setPhoneValue("");
+      setPhoneValue('');
     }
   }, [state?.success]);
 
@@ -45,22 +45,22 @@ export default function ContactSection() {
         if (autofilledValue && autofilledValue !== phoneValue) {
           // Clean and format the autofilled value
           // Remove any non-digit characters except the leading +
-          const cleaned = autofilledValue.replace(/[^\d+]/g, "");
+          const cleaned = autofilledValue.replace(/[^\d+]/g, '');
           setPhoneValue(cleaned);
         }
       });
     };
 
     // Listen for autofill events
-    phoneInput.addEventListener("change", handleAutofill);
-    phoneInput.addEventListener("input", handleAutofill);
+    phoneInput.addEventListener('change', handleAutofill);
+    phoneInput.addEventListener('input', handleAutofill);
     // Also listen for animationstart which can detect autofill
-    phoneInput.addEventListener("animationstart", handleAutofill);
+    phoneInput.addEventListener('animationstart', handleAutofill);
 
     return () => {
-      phoneInput.removeEventListener("change", handleAutofill);
-      phoneInput.removeEventListener("input", handleAutofill);
-      phoneInput.removeEventListener("animationstart", handleAutofill);
+      phoneInput.removeEventListener('change', handleAutofill);
+      phoneInput.removeEventListener('input', handleAutofill);
+      phoneInput.removeEventListener('animationstart', handleAutofill);
     };
   }, [phoneValue]);
 
@@ -144,11 +144,11 @@ export default function ContactSection() {
                       international
                       defaultCountry="US"
                       value={phoneValue}
-                      onChange={(value) => setPhoneValue(value || "")}
+                      onChange={(value) => setPhoneValue(value || '')}
                       className="phone-input bg-bone/50 border border-sand rounded-md focus-within:border-coral transition-colors"
                       placeholder="Enter phone number"
                       numberInputProps={{
-                        autoComplete: "tel",
+                        autoComplete: 'tel',
                       }}
                     />
                   </div>
@@ -207,10 +207,10 @@ export default function ContactSection() {
                   tabIndex={-1}
                   autoComplete="off"
                   style={{
-                    position: "absolute",
-                    left: "-9999px",
-                    width: "1px",
-                    height: "1px",
+                    position: 'absolute',
+                    left: '-9999px',
+                    width: '1px',
+                    height: '1px',
                   }}
                   aria-hidden="true"
                 />
@@ -231,7 +231,7 @@ export default function ContactSection() {
                   className="w-full md:w-auto"
                 >
                   {isPending ? (
-                    "Sending..."
+                    'Sending...'
                   ) : (
                     <>
                       Send Message
@@ -245,7 +245,7 @@ export default function ContactSection() {
             {/* Alternative Contact */}
             <div className="mt-8 pt-8 border-t border-sand text-center">
               <p className="text-sm text-driftwood">
-                Prefer email?{" "}
+                Prefer email?{' '}
                 <a
                   href="mailto:info@coralinelabs.com"
                   className="text-coral hover:underline"
