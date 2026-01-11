@@ -108,9 +108,9 @@ describe("ContactSection", () => {
     );
 
     // Check that optional fields have "(optional)" text
-    expect(container.querySelector('label[for="phone"]')).toHaveTextContent(
-      "(optional)",
-    );
+    expect(
+      container.querySelector('label[for="contact-phone"]'),
+    ).toHaveTextContent("(optional)");
     expect(container.querySelector('label[for="company"]')).toHaveTextContent(
       "(optional)",
     );

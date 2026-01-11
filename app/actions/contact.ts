@@ -3,6 +3,7 @@
 import { Resend } from "resend";
 import { z } from "zod";
 import { headers } from "next/headers";
+import { isPossiblePhoneNumber } from "libphonenumber-js";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -64,7 +65,13 @@ function isRateLimited(ip: string): boolean {
 const contactFormSchema = z.object({
   name: z.string().min(1, "Name is required").max(100, "Name is too long"),
   email: z.string().email("Please enter a valid email address"),
-  phone: z.string().optional(),
+  phone: z
+    .string()
+    .optional()
+    .refine(
+      (val) => !val || isPossiblePhoneNumber(val),
+      "Invalid phone number"
+    ),
   company: z.string().max(100, "Company name is too long").optional(),
   message: z
     .string()

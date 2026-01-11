@@ -1,12 +1,14 @@
 'use client';
 
-import { useActionState, useRef, useEffect } from 'react';
+import { useActionState, useRef, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { submitContactForm, ContactFormState } from '@/app/actions/contact';
 import { Send, CheckCircle, AlertCircle } from 'lucide-react';
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
 
 export default function ContactSection() {
   const [state, formAction, isPending] = useActionState<
@@ -14,11 +16,13 @@ export default function ContactSection() {
     FormData
   >(submitContactForm, null);
   const formRef = useRef<HTMLFormElement>(null);
+  const [phone, setPhone] = useState<string>('');
 
   // Only reset form on successful submission
   useEffect(() => {
     if (state?.success) {
       formRef.current?.reset();
+      setPhone('');
     }
   }, [state?.success]);
 
@@ -93,17 +97,18 @@ export default function ContactSection() {
 
                 {/* Phone */}
                 <div className="space-y-2">
-                  <Label htmlFor="phone" className="text-charcoal">
+                  <Label htmlFor="contact-phone" className="text-charcoal">
                     Phone <span className="text-driftwood">(optional)</span>
                   </Label>
-                  <Input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    autoComplete="tel"
-                    placeholder="Enter phone number"
-                    className="bg-bone/50 border-sand focus:border-coral"
+                  <PhoneInput
+                    id="contact-phone"
+                    international
+                    defaultCountry="CR"
+                    value={phone}
+                    onChange={(value) => setPhone(value || '')}
+                    className={`phone-input-wrapper ${state?.errors?.phone ? 'phone-input-error' : ''}`}
                   />
+                  <input type="hidden" name="phone" value={phone} />
                   {state?.errors?.phone && (
                     <p className="text-sm text-coral">
                       {state.errors.phone[0]}
